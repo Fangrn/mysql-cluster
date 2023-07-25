@@ -1,0 +1,5 @@
+shell.connect('root@db-cluster-1:3306');
+var cluster = dba.createCluster('cluster');
+cluster.addInstance('db-cluster-2:3306');
+cluster.addInstance('db-cluster-3:3306');
+cluster.status();
