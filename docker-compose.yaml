@@ -1,0 +1,138 @@
+version: "2"
+services:
+  db-cluster-1:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile-cluster
+    image: db-cluster-1
+    restart: always
+    container_name: db-cluster-1
+    volumes:
+      - /var/lib/mysql/db-cluster-1:/var/lib/mysql
+    ports:
+      - 33060:3306
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=roi1i1ia0ot
+    privileged: true
+    command: ['--server-id=1',
+              '--gtid_mode=ON',
+              '--enforce_gtid_consistency=ON',
+              '--master_info_repository=TABLE',
+              '--relay_log_info_repository=TABLE',
+              '--binlog_checksum=NONE',
+              '--log_slave_updates=ON',
+              '--log-bin=db-cluster-1-bin',
+              '--binlog_format=ROW',
+              '--transaction_write_set_extraction=XXHASH64',
+              '--plugin_load_add=group_replication.so',
+              '--loose-group_replication_group_name=aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+              '--loose-group_replication_start_on_boot=off',
+              '--loose-group_replication_local_address=db-cluster-1:33061',
+              '--loose-group_replication_group_seeds=db-cluster-1:33061,db-cluster-2:33062,db-cluster-3:33063',
+              '--loose-group_replication_bootstrap_group=off',
+              '--loose-group_replication_single_primary_mode=on',
+              '--loose-group_replication_enforce_update_everywhere_checks=off',
+              '--lower_case_table_names=1',
+              '--character-set-server=utf8',
+              '--collation-server=utf8_general_ci',
+              '--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION']
+
+  db-cluster-2:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile-cluster
+    image: db-cluster-2
+    restart: always
+    container_name: db-cluster-2
+    volumes:
+      - /var/lib/mysql/db-cluster-2:/var/lib/mysql
+    ports:
+      - 33070:3306
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=roi1i1ia0ot
+    privileged: true
+    command: ['--server-id=2',
+              '--gtid_mode=ON',
+              '--enforce_gtid_consistency=ON',
+              '--master_info_repository=TABLE',
+              '--relay_log_info_repository=TABLE',
+              '--binlog_checksum=NONE',
+              '--log_slave_updates=ON',
+              '--log-bin=db-cluster-2-bin',
+              '--binlog_format=ROW',
+              '--transaction_write_set_extraction=XXHASH64',
+              '--plugin_load_add=group_replication.so',
+              '--loose-group_replication_group_name=aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+              '--loose-group_replication_start_on_boot=off',
+              '--loose-group_replication_local_address=db-cluster-2:33062',
+              '--loose-group_replication_group_seeds=db-cluster-1:33061,db-cluster-2:33062,db-cluster-3:33063',
+              '--loose-group_replication_bootstrap_group=off',
+              '--loose-group_replication_single_primary_mode=on',
+              '--loose-group_replication_enforce_update_everywhere_checks=off',
+              '--lower_case_table_names=1',
+              '--character-set-server=utf8',
+              '--collation-server=utf8_general_ci',
+              '--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION']
+
+  db-cluster-3:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile-cluster
+    image: db-cluster-3
+    restart: always
+    container_name: db-cluster-3
+    volumes:
+      - /var/lib/mysql/db-cluster-3:/var/lib/mysql
+    ports:
+      - 33080:3306
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=roi1i1ia0ot
+    privileged: true
+    command: ['--server-id=3',
+              '--gtid_mode=ON',
+              '--enforce_gtid_consistency=ON',
+              '--master_info_repository=TABLE',
+              '--relay_log_info_repository=TABLE',
+              '--binlog_checksum=NONE',
+              '--log_slave_updates=ON',
+              '--log-bin=db-cluster-3-bin',
+              '--binlog_format=ROW',
+              '--transaction_write_set_extraction=XXHASH64',
+              '--plugin_load_add=group_replication.so',
+              '--loose-group_replication_group_name=aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+              '--loose-group_replication_start_on_boot=off',
+              '--loose-group_replication_local_address=db-cluster-3:33063',
+              '--loose-group_replication_group_seeds=db-cluster-1:33061,db-cluster-2:33062,db-cluster-3:33063',
+              '--loose-group_replication_bootstrap_group=off',
+              '--loose-group_replication_single_primary_mode=on',
+              '--loose-group_replication_enforce_update_everywhere_checks=off',
+              '--lower_case_table_names=1',
+              '--character-set-server=utf8',
+              '--collation-server=utf8_general_ci',
+              '--sql_mode=STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION']
+
+  db-mysql-router:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile-router
+    image: db-mysql-router
+    restart: always
+    container_name: db-mysql-router
+    ports:
+      - 6446:6446
+      - 6447:6447
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_HOST=db-cluster-1
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=roi1i1ia0ot
+      - MYSQL_INNODB_CLUSTER_MEMBERS=3
+    privileged: true
+    depends_on:
+      - db-cluster-1
+      - db-cluster-2
+      - db-cluster-3
