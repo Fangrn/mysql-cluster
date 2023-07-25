@@ -1,0 +1,3 @@
+FROM mysql:8.0.19
+MAINTAINER fangrn
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
