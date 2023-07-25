@@ -1,0 +1,5 @@
+FROM mysql/mysql-router:8.0.19
+MAINTAINER xbd
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+# ADD ./mysql-shell-8.0.19.tar.gz /mysql-shell/
+RUN cd /tmp/;curl -O https://dev.mysql.com/get/Downloads/MySQL-Shell/mysql-shell-8.0.19-linux-glibc2.12-x86-64bit.tar.gz;tar -xvf mysql-shell-8.0.19-linux-glibc2.12-x86-64bit.tar.gz -C /usr/local;cd /usr/local/;ln -s mysql-shell-8.0.19-linux-glibc2.12-x86-64bit mysql-shell;echo 'export PATH=/usr/local/mysql-shell/bin:$PATH' >> /etc/profile;
